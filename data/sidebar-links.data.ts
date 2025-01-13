@@ -21,7 +21,7 @@ interface SidebarLinksProps {
   name: string;
   inactiveIcon: IconType;
   activeIcon: IconType;
-  link: string;
+  link: string | null;
   disabled: boolean;
 }
 
@@ -44,14 +44,14 @@ export const sidebarLinks: SidebarLinksProps[] = [
     name: "Payment",
     inactiveIcon: MdOutlinePayments,
     activeIcon: MdPayments,
-    link: "/",
+    link: null,
     disabled: true,
   },
   {
     name: "Withdraw",
     inactiveIcon: PiHandWithdraw,
     activeIcon: PiHandWithdrawFill,
-    link: "/",
+    link: null,
     disabled: true,
   },
   {
@@ -61,11 +61,11 @@ export const sidebarLinks: SidebarLinksProps[] = [
     link: "/profile",
     disabled: false,
   },
-  {
-    name: "Logout",
-    inactiveIcon: IoLogOutOutline,
-    activeIcon: IoLogOut,
-    link: "/",
-    disabled: true,
-  },
+  // {
+  //   name: "Logout",
+  //   inactiveIcon: IoLogOutOutline,
+  //   activeIcon: IoLogOut,
+  //   link: "/",
+  //   disabled: true,
+  // },
 ];
