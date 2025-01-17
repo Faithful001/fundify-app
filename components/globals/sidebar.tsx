@@ -41,7 +41,7 @@ const Sidebar = () => {
 
   return (
     <div
-      className={`sidebar z-10 fixed flex flex-col justify-between border-r-2 border-white/20 bg-[#05060F] h-screen transition-all duration-300 ${
+      className={`sidebar z-20 fixed flex flex-col justify-between border-r-2 border-white/20 bg-[#05060F] h-screen transition-all duration-300 ${
         isMobile
           ? sidebarIsOpen
             ? "translate-x-0 w-64"

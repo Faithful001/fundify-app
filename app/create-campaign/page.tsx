@@ -13,26 +13,28 @@ import { ApiUrl } from "@/utils/apiUrl.util";
 import { ApiRequest } from "@/utils/apiRequest.util";
 import { Spinner, useToast } from "@chakra-ui/react";
 import { BigNumber, ethers } from "ethers";
+import { useRouter } from "next/navigation";
+import { Campaign } from "@/types";
+import { LocalStorage } from "@/utils/localStorage.util";
 
 const CreateCampaign = () => {
   const toast = useToast();
+  const router = useRouter();
   const [uploadToBlockchainIsLoading, setUploadToBlockchainIsLoading] =
     useState(false);
   const [uploadToBlockchainError, setUploadToBlockchainError] = useState("");
 
-  const [formData, setFormData] = useState<{
-    title: string;
-    description: string;
-    target: string; // Accept input as a string
-    deadline: string;
-    image: string;
-  }>({
+  const [formData, setFormData] = useState<
+    Omit<Campaign, "donators" | "owner" | "amountCollected" | "id">
+  >({
     title: "",
     description: "",
     target: "",
     deadline: "",
     image: "",
   });
+
+  // console.log("formData", formData);
 
   const [file, setFile] = useState<File | null>(null);
   const [dragging, setDragging] = useState(false);
@@ -85,7 +87,14 @@ const CreateCampaign = () => {
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) {
     const { name, value } = event.target;
-    setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
+
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [name]:
+        // name === "deadline"
+        //   ? Math.floor(new Date(value).getTime() / 1000)
+        value,
+    }));
   }
 
   const { mutate, isPending, isSuccess } = useMutation({
@@ -122,33 +131,73 @@ const CreateCampaign = () => {
   });
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    const walletIsConnected = LocalStorage.get("wallet-address");
+    if (!walletIsConnected) {
+      toast({
+        title: "Wallet Error",
+        description: "Connect wallet to create campaign",
+        status: "error",
+        position: "top",
+        isClosable: true,
+      });
+      return;
+    }
+
+    setUploadToBlockchainIsLoading(true);
     event.preventDefault();
 
-    mutate();
     if (!formData.target) {
       throw new Error("Target value is required");
     }
-    const parsedTarget = ethers.utils.parseUnits(formData.target, 18);
-    const { isLoading, error, isError, isSuccess } = await publishCampaign({
-      ...formData,
-      target: parsedTarget,
-    });
-    if (isError) {
+    try {
+      console.log("mutating...");
+      console.log("isSuccess", isSuccess);
+      mutate();
+      console.log("after mutating...");
+      console.log("creating the campaign...");
+      if (isSuccess) {
+        console.log("creating the campaign as isSuccess...");
+        const parsedTarget = ethers.utils.parseUnits(formData.target, 18);
+        const { success } = await publishCampaign({
+          ...formData,
+          target: parsedTarget,
+        });
+
+        if (success) {
+          toast({
+            description: "Campaign created successfully",
+            status: "success",
+            position: "top",
+          });
+          setFormData({
+            title: "",
+            description: "",
+            target: "",
+            deadline: "",
+            image: "",
+          });
+        } else {
+          toast({
+            description: "Failed to create campaign",
+            status: "error",
+            position: "top",
+            isClosable: true,
+          });
+        }
+
+        setUploadToBlockchainIsLoading(false);
+      }
+      // setUploadToBlockchainError(error);
+    } catch (error: any) {
       toast({
-        description: "Failed to create campaign",
+        description: error?.message || "Failed to create campaign",
         status: "error",
         position: "top",
       });
+    } finally {
+      setUploadToBlockchainIsLoading(false);
+      router.push("/");
     }
-    if (isSuccess) {
-      toast({
-        description: "Campaign created successfully",
-        status: "success",
-        position: "top",
-      });
-    }
-    setUploadToBlockchainIsLoading(isLoading);
-    setUploadToBlockchainError(error);
   }
 
   return (
@@ -209,27 +258,49 @@ const CreateCampaign = () => {
                 className={`${
                   dragging ? "bg-primary" : "bg-transparent"
                 } flex justify-center items-center text-white border border-white/30 w-full rounded-lg h-20 cursor-pointer`}
-                htmlFor="fileInput" // This must match the ID of the input element
+                htmlFor="fileInput"
               >
-                {file ? (
-                  <span>{file.name}</span> // Display the name of the selected/dropped file
+                {/* {file ? (
+                  <span>{file.name}</span> 
+                ) : ( */}
+                {/* <div className="flex flex-col items-center justify-center gap-2"> */}
+                {!previewUrl || !file ? (
+                  <>
+                    <FiUploadCloud /> <p>Drag & Drop or Click to Upload</p>
+                  </>
                 ) : (
-                  <div className="flex flex-col items-center justify-center gap-2">
-                    <FiUploadCloud />
-                    <p>Drag & Drop or Click to Upload</p>
-                  </div> // Placeholder text before a file is selected
+                  <span className="relative w-full h-full flex items-center justify-center">
+                    <IoCloseCircleSharp
+                      className="absolute top-2 right-2 cursor-pointer z-10"
+                      size={"22px"}
+                      onClick={() => {
+                        setPreviewUrl(null);
+                        setFile(null);
+                      }}
+                    />
+                    <Image
+                      src={previewUrl}
+                      alt="Preview"
+                      className="rounded-lg object-contain"
+                      width={50}
+                      height={50}
+                      style={{ width: "100%", height: "100%" }}
+                    />
+                  </span>
                 )}
+                {/* </div>  */}
+                {/* )} */}
               </label>
 
               <Input
                 type="file"
-                id="fileInput" // Ensure this matches the `htmlFor` in the label
+                id="fileInput"
                 className="hidden"
                 onChange={handleFileChange}
-                accept="image/*" // Optional: accept only image files
+                accept="image/*"
               />
             </div>
-            {previewUrl && (
+            {/* {previewUrl && (
               <span className="relative">
                 <IoCloseCircleSharp
                   className="absolute -top-2 -right-2 cursor-pointer"
@@ -247,7 +318,7 @@ const CreateCampaign = () => {
                   height={70}
                 />
               </span>
-            )}
+            )} */}
           </div>
           <Button
             type="submit"
@@ -256,7 +327,7 @@ const CreateCampaign = () => {
               isPending || !allFieldsArePopulated || uploadToBlockchainIsLoading
             }
           >
-            {isPending ? <Spinner /> : "Publish"}
+            {isPending || uploadToBlockchainIsLoading ? <Spinner /> : "Publish"}
           </Button>
         </form>
       </div>

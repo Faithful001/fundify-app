@@ -17,8 +17,8 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
           className={`dashboard-main-content pt-24 ${
             isMobile
               ? sidebarIsOpen
-                ? "pl-72"
-                : "pl-24"
+                ? "pl-5"
+                : "pl-5"
               : sidebarIsOpen
               ? "pl-72"
               : "pl-24"

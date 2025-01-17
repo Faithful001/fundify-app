@@ -9,6 +9,7 @@ import BlockchainContextProvider from "@/contexts/BlockchainContext";
 import UserContextProvider from "@/contexts/UserContext";
 import TWProvider from "@/providers/ThirdwebProvider";
 import ReactQueryProvider from "@/providers/ReactQueryProvider";
+import { Suspense } from "react";
 
 const bricolageGrotesque = Bricolage_Grotesque({
   subsets: ["latin"],
@@ -27,19 +28,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={bricolageGrotesque.className}>
-        <TWProvider>
-          <ReactQueryProvider>
-            <BlockchainContextProvider>
-              <UserContextProvider>
-                <Provider>
-                  <ChakraProvider>{children}</ChakraProvider>
-                </Provider>
-              </UserContextProvider>
-            </BlockchainContextProvider>
-          </ReactQueryProvider>
-        </TWProvider>
+        <Suspense>
+          <TWProvider>
+            <ReactQueryProvider>
+              <BlockchainContextProvider>
+                <UserContextProvider>
+                  <Provider>
+                    <ChakraProvider>{children}</ChakraProvider>
+                  </Provider>
+                </UserContextProvider>
+              </BlockchainContextProvider>
+            </ReactQueryProvider>
+          </TWProvider>
+        </Suspense>
       </body>
     </html>
   );
