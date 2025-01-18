@@ -171,12 +171,10 @@ const CampaignDetails = () => {
                   </span>
                 ) : (
                   campaignData.donators.map((donator, index) => (
-                    <div className="flex items-center w-full">
+                    <div className="flex items-center w-full" key={index}>
                       <span className="flex flex-col items-start">
-                        <p key={index}>
-                          {Format.truncateString(donator.donator)}
-                        </p>
-                        <p key={index} className="text-sm text-white/70">
+                        <p>{Format.truncateString(donator.donator)}</p>
+                        <p className="text-sm text-white/70">
                           {ethers.utils.formatEther(donator.amount)}
                         </p>
                       </span>
