@@ -10,6 +10,8 @@ import UserContextProvider from "@/contexts/UserContext";
 import TWProvider from "@/providers/ThirdwebProvider";
 import ReactQueryProvider from "@/providers/ReactQueryProvider";
 import { Suspense } from "react";
+import ClientLayout from "./client-layout";
+import { ModalContextProvider } from "@/contexts/ModalContextProvider";
 
 const bricolageGrotesque = Bricolage_Grotesque({
   subsets: ["latin"],
@@ -35,9 +37,13 @@ export default function RootLayout({
             <ReactQueryProvider>
               <BlockchainContextProvider>
                 <UserContextProvider>
-                  <Provider>
-                    <ChakraProvider>{children}</ChakraProvider>
-                  </Provider>
+                  <ModalContextProvider>
+                    <Provider>
+                      <ChakraProvider>
+                        <ClientLayout>{children}</ClientLayout>
+                      </ChakraProvider>
+                    </Provider>
+                  </ModalContextProvider>
                 </UserContextProvider>
               </BlockchainContextProvider>
             </ReactQueryProvider>

@@ -12,9 +12,11 @@ import wallet_icon from "@/public/assets/icons/campaign-card-amount-icon.svg";
 import calendar_icon from "@/public/assets/icons/campaign-card-deadline-icon.svg";
 import { Format } from "@/utils/format.util";
 import { ethers } from "ethers";
-import { MdCallReceived } from "react-icons/md";
+import { MdArrowOutward, MdCallReceived } from "react-icons/md";
 import { BiDonateHeart } from "react-icons/bi";
 import { FaRegSadTear } from "react-icons/fa";
+import Button from "@/components/ui/buttons";
+import { useModal } from "@/contexts/ModalContextProvider";
 
 const CampaignDetails = () => {
   const { getCampaign } = useBlockchain();
@@ -22,6 +24,8 @@ const CampaignDetails = () => {
   const params: { _id: string } = useParams();
   const [campaignData, setCampaignData] = useState<Campaign | null>(null);
   const [campaignError, setCampaignError] = useState<string>("");
+
+  const { setShowModal, setModalPayload } = useModal();
 
   // const [donators, seto]
 
@@ -44,9 +48,9 @@ const CampaignDetails = () => {
     }
   }, [params._id, getCampaign]);
 
-  console.log("campaignData", campaignData);
-  console.log("campaignError", campaignError);
-  console.log("campaignIsLoading", campaignIsLoading);
+  // console.log("campaignData", campaignData);
+  // console.log("campaignError", campaignError);
+  // console.log("campaignIsLoading", campaignIsLoading);
 
   return (
     <DashboardLayout>
@@ -70,11 +74,24 @@ const CampaignDetails = () => {
         ) : (
           <div className="flex flex-col gap-8">
             <div
-              className="relative w-full h-[8rem] rounded-lg overflow-hidden"
+              className="relative w-full h-[8rem] rounded-lg overflow-hidden group"
               style={{
                 clipPath: "inset(0 0 0 0 round 0.5rem)",
               }}
             >
+              <div className="inset-0 absolute w-full h-full flex items-center justify-center bg-black/70 z-10 group-hover:opacity-100 opacity-0 transition-opacity duration-200">
+                <span
+                  className="flex items-center gap-1 hover:underline text-xs text-white/65 hover:text-white cursor-pointer"
+                  onClick={() => {
+                    setShowModal("view-image");
+                    setModalPayload({ image: campaignData.image });
+                  }}
+                >
+                  View image
+                  <MdArrowOutward />
+                </span>
+              </div>
+
               {campaignData?.image && (
                 <Image
                   src={campaignData?.image}
@@ -137,14 +154,15 @@ const CampaignDetails = () => {
                     {Format.convertToDate(Number(campaignData.deadline))}
                   </p>
                 </span>
+                <Button type="button" className="sm:w-max w-full">
+                  Donate <BiDonateHeart />
+                </Button>
               </div>
               {/* Donors */}
-              <div className="p-3 rounded-lg bg-[#1d1e2e] sticky top-20 right-2 sm:w-full w-[20rem] h-[20rem] overflow-auto">
+              <div className="p-3 rounded-lg bg-[#1d1e2e] sm:sticky top-20 right-2 sm:w-[20rem] w-full h-[20rem] overflow-auto">
                 {campaignData.donators.length < 1 ? (
                   <span className="flex flex-col gap-4 items-center justify-center w-full">
-                    <p className="flex items-center gap-1">
-                      No donor yet <BiDonateHeart />
-                    </p>
+                    <p className="flex items-center gap-1">No donor yet</p>
                     <FaRegSadTear
                       size={"8rem"}
                       // opacity={50}

@@ -1,11 +1,18 @@
 "use client";
-import { ThirdwebProvider } from "@thirdweb-dev/react";
+import ViewImageModal from "@/components/pages/campaign/view-image-modal";
+import { useModal } from "@/contexts/ModalContextProvider";
+// import { ThirdwebProvider } from "@thirdweb-dev/react";
 
 const ClientLayout = ({ children }: { children: React.ReactNode }) => {
+  const { showModal } = useModal();
   return (
-    <div>
-      <ThirdwebProvider>{children}</ThirdwebProvider>
-    </div>
+    <>
+      {showModal === "view-image" && <ViewImageModal />}
+      <div>
+        {/* <ThirdwebProvider>{children}</ThirdwebProvider> */}
+        {children}
+      </div>
+    </>
   );
 };
 
