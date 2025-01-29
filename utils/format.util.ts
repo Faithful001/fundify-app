@@ -8,7 +8,7 @@ export class Format {
     addEllipsis: boolean = true
   ) {
     const truncatedString =
-      string?.slice(start, end) + addEllipsis ? "..." : "";
+      string?.slice(start, end) + (addEllipsis ? "..." : "");
     return truncatedString;
   }
 
@@ -38,5 +38,17 @@ export class Format {
    */
   public static convertToBlockTimeStamp(dateString: string): number {
     return Math.floor(new Date(dateString).getTime() / 1000);
+  }
+
+  public static daysLeft(deadline: string): number {
+    const [year, month, day] = deadline?.split("-")?.map(Number);
+    const targetDate = new Date(year, month - 1, day); // Month is zero-based in JavaScript Date
+
+    const difference = targetDate.getTime() - Date.now();
+
+    // Convert the difference to days
+    const remainingDays = Math.ceil(difference / (1000 * 3600 * 24));
+
+    return remainingDays;
   }
 }

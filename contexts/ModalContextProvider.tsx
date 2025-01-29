@@ -29,8 +29,8 @@ export const ModalContextProvider = <T = any,>({
 }: ModalProviderProps<T>) => {
   const [showModal, setShowModal] = useState<string>("");
   const [modalPayload, setModalPayload] = useState<T | undefined>(undefined);
-  console.log("showModal", showModal);
-  console.log("modalPayload", modalPayload);
+  // console.log("showModal", showModal);
+  // console.log("modalPayload", modalPayload);
 
   const value = useMemo(
     () => ({

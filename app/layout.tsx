@@ -31,7 +31,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={bricolageGrotesque.className}>
+      <body className={`${bricolageGrotesque.className} bg-[#05060F]`}>
         <Suspense>
           <TWProvider>
             <ReactQueryProvider>

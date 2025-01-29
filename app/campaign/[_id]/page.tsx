@@ -48,9 +48,10 @@ const CampaignDetails = () => {
     }
   }, [params._id, getCampaign]);
 
-  // console.log("campaignData", campaignData);
-  // console.log("campaignError", campaignError);
-  // console.log("campaignIsLoading", campaignIsLoading);
+  const deadline =
+    campaignData?.deadline &&
+    Format.convertToDate(Number(campaignData.deadline));
+  // console.log("deadline", deadline);
 
   return (
     <DashboardLayout>
@@ -151,10 +152,17 @@ const CampaignDetails = () => {
                     <p className="text-white/70 font-bold">DEADLINE</p>
                   </span>
                   <p className="text-sm">
-                    {Format.convertToDate(Number(campaignData.deadline))}
+                    {deadline && Format.daysLeft(deadline)} day(s) left
                   </p>
                 </span>
-                <Button type="button" className="sm:w-max w-full">
+                <Button
+                  type="button"
+                  className="sm:w-max w-full"
+                  onClick={() => {
+                    setShowModal("donate");
+                    setModalPayload({ id: params._id });
+                  }}
+                >
                   Donate <BiDonateHeart />
                 </Button>
               </div>

@@ -11,12 +11,16 @@ import { useEffect, useState } from "react";
 import { IoLogOutOutline } from "react-icons/io5";
 import { sidebarIsOpenAtom } from "@/atoms/SidebarAtom";
 import { useAtom } from "jotai";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useUser } from "@/contexts/UserContext";
 
 const Sidebar = () => {
   const [sidebarIsOpen, setSidebarIsOpen] = useAtom(sidebarIsOpenAtom);
   const [isMobile] = useMediaQuery("(max-width: 768px)");
   const pathname = usePathname();
+  const router = useRouter();
+
+  const { unSetWalletAddress } = useUser();
 
   useEffect(() => {
     const handleResize = () => {
@@ -76,7 +80,7 @@ const Sidebar = () => {
         <div
           className={`flex flex-col ${
             !sidebarIsOpen && "items-center"
-          } gap-3 pt-4 px-2`}
+          } gap-3 pt-4 px-2 text-white `}
         >
           {sidebarLinks.map((node, index) =>
             node.link !== null ? (
@@ -87,7 +91,7 @@ const Sidebar = () => {
                   pathname === node.link ? "bg-primary" : ""
                 } px-4 flex items-center gap-3 hover:bg-primary p-2 rounded-md transition-opacity duration-300`}
               >
-                <node.inactiveIcon size={"20px"} />
+                <node.inactiveIcon size={"20px"} color="#ffffff" />
                 {sidebarIsOpen && (
                   <p
                     className={` ${
@@ -105,7 +109,7 @@ const Sidebar = () => {
                   pathname === node.link ? "bg-primary" : ""
                 } cursor-not-allowed opacity-50 px-4 flex items-center gap-3 hover:bg-primary p-2 rounded-md transition-opacity duration-300`}
               >
-                <node.inactiveIcon size={"20px"} />
+                <node.inactiveIcon size={"20px"} color="#ffffff" />
                 {sidebarIsOpen && (
                   <p
                     className={` ${
@@ -120,13 +124,17 @@ const Sidebar = () => {
           )}
         </div>
       </div>
-      <div className="p-4">
+      <div className="p-4 text-white ">
         <span
           className={`flex items-center w-full ${
             !sidebarIsOpen && "justify-center"
           }  gap-3 hover:cursor-pointer p-2 rounded-md transition-opacity duration-300`}
+          onClick={() => {
+            unSetWalletAddress();
+            router.push("/");
+          }}
         >
-          <IoLogOutOutline size={"20px"} />
+          <IoLogOutOutline size={"20px"} color="#ffffff" />
           {sidebarIsOpen && (
             <p
               className={` ${

@@ -13,6 +13,7 @@ import {
   TbLayoutSidebarFilled,
   TbLayoutSidebarRightFilled,
 } from "react-icons/tb";
+import Searchbar from "../ui/searchbar";
 
 const Navbar = () => {
   const [sidebarIsOpen, setSidebarIsOpen] = useAtom(sidebarIsOpenAtom);
@@ -38,7 +39,6 @@ const Navbar = () => {
   // console.log("walletAddress from userUser", walletAddress);
 
   const connectWallet = async () => {
-    console.log("connect wallet button clicked");
     await handleConnect();
     console.log("wallet connected");
     if (address) LocalStorage.set("wallet-address", address);
@@ -46,9 +46,7 @@ const Navbar = () => {
 
   return (
     <div
-      className={`navbar h-[4.35rem] w-full fixed flex items-center z-10 ${
-        isMobile ? "justify-between" : "justify-end"
-      } border-b-2 border-white/20 bg-[#05060F] p-2 px-4 `}
+      className={`navbar h-[4.35rem] w-full fixed flex items-center z-10 justify-between border-b-2 border-white/20 bg-[#05060F] p-2 px-4 `}
     >
       {isMobile ? (
         sidebarIsOpen ? (
@@ -68,19 +66,32 @@ const Navbar = () => {
         ""
         // <p></p>
       )}
+      <div
+        className={`flex items-center justify-between w-full ${
+          isMobile
+            ? sidebarIsOpen
+              ? "pl-0"
+              : "pl-0"
+            : sidebarIsOpen
+            ? "pl-64"
+            : "pl-20"
+        }`}
+      >
+        <Searchbar />
 
-      {/* <ConnectWallet/> */}
-      {isLoading ? (
-        <Skeleton height="30px" width="60px" />
-      ) : walletConnected || (address && walletAddress) ? (
-        <p>
-          {address && walletAddress && Format.truncateString(walletAddress)}
-        </p>
-      ) : (
-        <Button type="button" className="text-sm" onClick={connectWallet}>
-          Connect Wallet
-        </Button>
-      )}
+        {/* <ConnectWallet/> */}
+        {isLoading ? (
+          <Skeleton height="30px" width="60px" />
+        ) : walletConnected || (address && walletAddress) ? (
+          <p>
+            {address && walletAddress && Format.truncateString(walletAddress)}
+          </p>
+        ) : (
+          <Button type="button" className="text-sm" onClick={connectWallet}>
+            Connect Wallet
+          </Button>
+        )}
+      </div>
     </div>
   );
 };

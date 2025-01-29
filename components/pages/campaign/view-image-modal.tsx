@@ -23,7 +23,6 @@ interface ModalPayload {
 
 const ViewImageModal = () => {
   const { showModal, setShowModal, modalPayload } = useModal<ModalPayload>();
-  console.log("image from modalPayload", modalPayload?.image);
   return (
     <ModalLayout
       isOpen={showModal === "view-image"}

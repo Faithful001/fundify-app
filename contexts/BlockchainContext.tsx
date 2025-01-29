@@ -33,9 +33,10 @@ interface BlockchainContextProps {
     | { success: boolean; error: any }
   >;
   getCampaigns: () => Promise<Campaign[]>;
+  getUserCampaigns: (owner: string) => Promise<Campaign[]>;
   getCampaign: (id: string | number) => Promise<Campaign | null>;
   getDonators: (id: string | number) => Promise<Donator[]>;
-  donateToCampaign: (pId: string | number, amount: string) => Promise<any>;
+  donateToCampaign: (id: string | number, amount: string) => Promise<any>;
 }
 
 // Create BlockchainContext
@@ -189,10 +190,11 @@ const BlockchainContextProvider = ({
           description: campaign.description,
           target: ethers.utils.formatEther(campaign.target.toString()),
           deadline: campaign.deadline,
-          amountCollected: ethers.utils.formatEther(
-            campaign.amountCollected.toString()
+          amountCollected: parseFloat(
+            ethers.utils.formatEther(campaign.amountCollected.toString())
           ),
           image: campaign.image,
+          donators: campaign.donators,
           pId: index,
         })
       );
@@ -204,7 +206,55 @@ const BlockchainContextProvider = ({
       console.error("Error fetching campaigns:", error);
       toast({
         title: "Fetch Failed",
-        description: error.message || "Unable to fetch campaigns.",
+        description: "Unable to fetch campaigns.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+        position: "top",
+      });
+      return [];
+    }
+  };
+
+  const getUserCampaigns = async (owner: string) => {
+    try {
+      if (!contract) {
+        console.error("Contract instance is not initialized.");
+        return [];
+      }
+
+      const campaigns: any[] = await contract?.call("getCampaigns");
+
+      // Filter campaigns based on the owner
+      const userCampaigns = campaigns.filter(
+        (campaign) => campaign.owner.toLowerCase() === owner.toLowerCase()
+      );
+
+      const parsedCampaigns = userCampaigns?.map(
+        (campaign: Campaign, index: number) => ({
+          id: campaign.id,
+          owner: campaign.owner,
+          title: campaign.title,
+          description: campaign.description,
+          target: ethers.utils.formatEther(campaign.target.toString()),
+          deadline: campaign.deadline,
+          amountCollected: parseFloat(
+            ethers.utils.formatEther(campaign.amountCollected.toString())
+          ),
+          image: campaign.image,
+          donators: campaign.donators,
+          pId: index,
+        })
+      );
+
+      console.log("Campaigns fetched successfully:", parsedCampaigns);
+
+      return parsedCampaigns;
+    } catch (error: any) {
+      console.error("Error fetching campaigns:", error);
+      toast({
+        title: "Fetch Failed",
+        description: "Unable to fetch campaigns.",
         status: "error",
         duration: 3000,
         isClosable: true,
@@ -222,7 +272,7 @@ const BlockchainContextProvider = ({
       console.error("Error fetching campaign:", error);
       toast({
         title: "Fetch Failed",
-        description: error.message || "Unable to fetch campaign details.",
+        description: "Unable to fetch campaign details.",
         status: "error",
         duration: 3000,
         isClosable: true,
@@ -244,7 +294,7 @@ const BlockchainContextProvider = ({
       console.error("Error fetching donators:", error);
       toast({
         title: "Fetch Failed",
-        description: error.message || "Unable to fetch donators.",
+        description: "Unable to fetch donators.",
         status: "error",
         duration: 3000,
         isClosable: true,
@@ -256,6 +306,7 @@ const BlockchainContextProvider = ({
 
   const donateToCampaign = async (id: string | number, amount: string) => {
     try {
+      console.log("donate to campaign method reached");
       const response = await contract?.call("donateToCampaign", [id], {
         value: ethers.utils.parseEther(amount),
       });
@@ -274,7 +325,7 @@ const BlockchainContextProvider = ({
       console.error("Error donating to campaign:", error);
       toast({
         title: "Donation Failed",
-        description: error.message || "Unable to process your donation.",
+        description: "Unable to process your donation.",
         status: "error",
         duration: 3000,
         isClosable: true,
@@ -293,6 +344,7 @@ const BlockchainContextProvider = ({
         setWalletConnected,
         publishCampaign,
         getCampaigns,
+        getUserCampaigns,
         getCampaign,
         getDonators,
         donateToCampaign,

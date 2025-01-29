@@ -150,13 +150,13 @@ const CreateCampaign = () => {
       throw new Error("Target value is required");
     }
     try {
-      console.log("mutating...");
-      console.log("isSuccess", isSuccess);
+      // console.log("mutating...");
+      // console.log("isSuccess", isSuccess);
       mutate();
-      console.log("after mutating...");
-      console.log("creating the campaign...");
+      // console.log("after mutating...");
+      // console.log("creating the campaign...");
       if (isSuccess) {
-        console.log("creating the campaign as isSuccess...");
+        // console.log("creating the campaign as isSuccess...");
         const parsedTarget = ethers.utils.parseUnits(formData.target, 18);
         const { success } = await publishCampaign({
           ...formData,
