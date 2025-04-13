@@ -101,7 +101,9 @@ const CampaignCard = ({
           <p className="text-sm">
             {deadline
               ? // ? new Date(deadline * 1000).toLocaleDateString() // Convert Unix timestamp to date
-                Format.daysLeft(deadline) + " day(s) left" // Convert Unix timestamp to date
+                Format.daysLeft(deadline) > 1
+                ? Format.daysLeft(deadline) + " day(s) left"
+                : "Expired " + Math.abs(Format.daysLeft(deadline)) + " days ago" // Convert Unix timestamp to date
               : "No deadline"}
           </p>
         </span>

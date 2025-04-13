@@ -40,7 +40,7 @@ const Navbar = () => {
 
   const connectWallet = async () => {
     await handleConnect();
-    console.log("wallet connected");
+    // console.log("wallet connected");
     if (address) LocalStorage.set("wallet-address", address);
   };
 

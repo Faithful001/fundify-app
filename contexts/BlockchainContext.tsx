@@ -73,9 +73,9 @@ const BlockchainContextProvider = ({
   const handleConnect = async () => {
     try {
       const connectOptions = { chainId: chain?.chainId };
-      console.log("handle connect function reached");
+      // console.log("handle connect function reached");
       const wallet = await connect(walletConfig, connectOptions);
-      console.log("Connected to", wallet);
+      // console.log("Connected to", wallet);
       setWalletConnected(true);
       toast({
         title: "Wallet Connected",
@@ -86,10 +86,25 @@ const BlockchainContextProvider = ({
         position: "top",
       });
     } catch (error: any) {
-      console.error("Failed to connect", error);
+      // console.error("Failed to connect", error);
+      // console.error("error code", error.code);
+      const cause = (error.message as string).split("Cause");
+      // console.log("Cause", cause);
+      const causeObjectString = cause[1];
+      // console.log("causeObjectString", causeObjectString);
+      const errorCode: string = causeObjectString.split(",")[0].split(":")[2];
+
+      // Check for specific error codes or messages
+      let errorMessage = "Unable to connect your wallet.";
+      if (error.code === "UNAUTHORIZED" || errorCode == "-32002") {
+        errorMessage = "Please log in to your wallet to connect.";
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
       toast({
         title: "Connection Failed",
-        description: error.message || "Unable to connect your wallet.",
+        description: errorMessage,
         status: "error",
         duration: 3000,
         isClosable: true,
@@ -106,7 +121,7 @@ const BlockchainContextProvider = ({
     image: string;
   }) => {
     try {
-      console.log("publishCampaign function reached");
+      // console.log("publishCampaign function reached");
       // Ensure deadline is properly formatted as a timestamp
       const deadlineTimestamp = Math.floor(
         new Date(form.deadline).getTime() / 1000
@@ -125,8 +140,6 @@ const BlockchainContextProvider = ({
           form.image,
         ],
       });
-
-      console.log("response", response);
 
       // Check the transaction status from the receipt
       const receipt = response.receipt;
@@ -199,11 +212,8 @@ const BlockchainContextProvider = ({
         })
       );
 
-      console.log("campaigns from blockchain context", parsedCampaigns);
-
       return parsedCampaigns;
     } catch (error: any) {
-      console.error("Error fetching campaigns:", error);
       toast({
         title: "Fetch Failed",
         description: "Unable to fetch campaigns.",
@@ -246,8 +256,6 @@ const BlockchainContextProvider = ({
           pId: index,
         })
       );
-
-      console.log("Campaigns fetched successfully:", parsedCampaigns);
 
       return parsedCampaigns;
     } catch (error: any) {
@@ -306,7 +314,7 @@ const BlockchainContextProvider = ({
 
   const donateToCampaign = async (id: string | number, amount: string) => {
     try {
-      console.log("donate to campaign method reached");
+      // console.log("donate to campaign method reached");
       const response = await contract?.call("donateToCampaign", [id], {
         value: ethers.utils.parseEther(amount),
       });
