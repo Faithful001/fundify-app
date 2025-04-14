@@ -85,7 +85,7 @@ export default function Profile() {
     <DashboardLayout>
       <div className="flex flex-col gap-6">
         <header className="flex flex-col gap-1">
-          <h1 className="text-xl font-semibold">Your campaigns Campaigns</h1>
+          <h1 className="text-xl font-semibold">Your campaigns</h1>
           {/* <p className="text-off-white/60 text-sm">Donate to a project today</p> */}
         </header>
         {!walletAddress ? (
